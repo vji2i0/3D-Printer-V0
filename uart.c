@@ -32,6 +32,7 @@ ISR(USART_RXC_vect){
 	*/
 	/*static uint8_t k = 0;*/
 	static uint8_t buffer[BUFFER_LENGTH];
+	uint8_t bufferSwap[BUFFER_LENGTH];
 	static uint8_t was_comment = 0;
 	static int k = 0;
 	/*
@@ -51,22 +52,30 @@ ISR(USART_RXC_vect){
 				k++;
 			}
 		}else{
+			for (k = BUFFER_LENGTH - 1; k >= 0; k--){
+				bufferSwap[k]=buffer[k];
+				buffer[k] = 0;
+			}
+			k=0;
 			sendStaicMessage(ERROR_BUFFER_OVERFOLLOW);
 		}
 	}else{
 		was_comment = 0;
 		/*
+			Clear the buffer before analyzing
+		*/
+		for (k = BUFFER_LENGTH - 1; k >= 0; k--){
+			bufferSwap[k]=buffer[k];
+			buffer[k] = 0;
+		}
+		k=0;
+		/*
 			The command have been arrived.
 			Lets analyze it!
 		*/
+		AnalyzeCommand(bufferSwap);
 
-		AnalyzeCommand(buffer);
-		/*
-			Clear the buffer after analyzing
-		*/
-		for (k = BUFFER_LENGTH - 1; k > 0; k--){
-			buffer[k] = '\n';
-		}
+
 	}
 
 }

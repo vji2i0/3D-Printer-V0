@@ -19,10 +19,10 @@
 
 #define PHASE_LENGTH 8
 #define BUFFER_LENGTH 64
-#define ERROR_BUFFER_OVERFOLLOW PSTR("Error: the commant buffer full!\n\r")
-#define WARNING_NOTHING_TO_DO PSTR("Warning: nothing to do!\n\r")
-#define WARNING_UNSUPPORTED_COMMAND PSTR("Warning: unsupported command!\n\r")
-#define SUCCESS_DONE PSTR("ok\n\r")
+#define ERROR_BUFFER_OVERFOLLOW PSTR("Error: the commant buffer full!\n")
+#define WARNING_NOTHING_TO_DO PSTR("Warning: nothing to do!\n")
+#define WARNING_UNSUPPORTED_COMMAND PSTR("Warning: unsupported command!\n")
+#define SUCCESS_DONE PSTR("ok\n")
 #define ABSOLUTE_POSITIONING 0b01000000
 #define NEW_TASK 0b10000000
 #define STEPS_PER_X 5

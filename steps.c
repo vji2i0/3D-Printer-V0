@@ -106,10 +106,10 @@ ISR(TIMER1_OVF_vect){
 				*/
 				state0 &= ~NEW_TASK;
 				i = 0;
-				sendStaicMessage(SUCCESS_DONE);
 				/*Для охлаждения*/
 				PORTC = 0b00000000;
 				PORTB = 0b00000000;
+				sendStaicMessage(SUCCESS_DONE);
 			}
 		}
 		/*
@@ -124,10 +124,11 @@ ISR(TIMER1_OVF_vect){
 	}else if ((state0 == NEW_TASK) && (translation_discret_length == 0)){
 		state0 &= ~NEW_TASK;
 		i = 0;
-		sendStaicMessage(SUCCESS_DONE);
+		j = 0;
 		/*Для охлаждения*/
 		PORTC = 0b00000000;
 		PORTB = 0b00000000;
+		sendStaicMessage(SUCCESS_DONE);
 	}
 }
 
@@ -182,6 +183,8 @@ void moveOn(float F){ /*Здесь ошибка*/
 	Смысл F - это скорость движения, выраженная в мм/мин	
 	*/
 	if (F>6000){F=6000;}
+	//if (F<1000){F=1000;}	
+	//F=6000;
 	/*
 		Calculate speed if F changed
 	*/
@@ -209,9 +212,9 @@ void moveOn(float F){ /*Здесь ошибка*/
 		*/
 		/*kappa = translation_length*CPU_FREQURENCY*60/(F*TIMER1_DIVIDER*translation_discret_length);*/
 		if (translation_discret_length == 0){
-			kappa = (OVERFLOWS_PER_SECOND_TIMER1*60)/(STEPS_PER_X*((int) F));
+			kappa = (OVERFLOWS_PER_SECOND_TIMER1*60)/(STEPS_PER_X*((long) F));
 		}else{
-			kappa = (OVERFLOWS_PER_SECOND_TIMER1*60)/(STEPS_PER_X*((int) F)); /*По всем осям на один милиметр смещения приходится 5 шагов*/
+			kappa = (OVERFLOWS_PER_SECOND_TIMER1*60)/(STEPS_PER_X*((long) F)); /*По всем осям на один милиметр смещения приходится 5 шагов*/
 		}
 		
 		/*if (F==10000) {PORTC ^= (1 << PC3);}*/
@@ -227,7 +230,7 @@ void moveOn(float F){ /*Здесь ошибка*/
 	/*
 		Let's move!
 	*/
-	state0 |= NEW_TASK;
+	state0 = NEW_TASK;
 }
 
 void doStep(signed char motor){
