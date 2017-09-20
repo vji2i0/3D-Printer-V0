@@ -30,7 +30,8 @@ void AnalyzeCommand(uint8_t *buffer){
 	/*
 		Init commands
 	*/
-	uint8_t G = 0, M = 0, S = 0;
+	uint8_t G = 0, M = 0;
+	//static uint8_t S = 0;
 	float x = 0, y = 0, z = 0, e = 0; /*f=0*/
 	static float f;
 	//struct vector placement;
@@ -51,7 +52,7 @@ void AnalyzeCommand(uint8_t *buffer){
 		recognize_flag |= 0b01000000;
 	}
 	if ((base = strchr((const char*)buffer, 'S')) != NULL){
-		S = atoi(base + sizeof(uint8_t));
+	//	S = atoi(base + sizeof(uint8_t));
 		recognize_flag |= 0b00100000;
 	}
 	if ((base = strchr((const char*)buffer, 'X')) != NULL){
@@ -83,7 +84,7 @@ void AnalyzeCommand(uint8_t *buffer){
 			switch(G){
 				case 0:
 				case 1: {
-					placement = location; 
+					//placement = location; 
 					/*placement.x = (float) location.x;
 					placement.y = (float) location.y;
 					placement.z = (float) location.z;
@@ -98,28 +99,51 @@ void AnalyzeCommand(uint8_t *buffer){
 							Absolute positioning
 						*/
 						placement.x = x;
+					}else{
+						placement.x = location.x;
 					}
 					if (recognize_flag & 0b00001000){
 						/*
 							Absolute positioning
 						*/
 						placement.y = y;
+					}else{
+						placement.y = location.y;
 					}
 					if (recognize_flag & 0b00000100){
 						/*
 							Absolute positioning
 						*/
 						placement.z = z;
+					}else{
+						placement.z = location.z;
 					}
 					if (recognize_flag & 0b00000010){
 						/*
 							Absolute positioning
 						*/
 						placement.e = e;
+					}else{
+						placement.e = location.e;
 					}
 					/*if (f==100) {PORTC ^= (1 << PC2);}*/
 					//if(placement.x != 0) {PORTC |= (1<<PC1);}
 					moveOn(f);
+					break;
+				}
+				case 92: {
+					location.x = 0;
+					location.y = 0;
+					location.z = 0;
+					if (recognize_flag & 0b00000010){
+						/*
+							Absolute positioning
+						*/
+						location.e = e;
+					}else{
+						location.e = 0; /*or preserves the old value?*/
+					}
+					sendStaicMessage(SUCCESS_DONE);
 					break;
 				}
 				default: {
@@ -128,8 +152,7 @@ void AnalyzeCommand(uint8_t *buffer){
 				}
 			}
 
-		}
-		if (recognize_flag & 0b01000000){
+		}else if (recognize_flag & 0b01000000){
 			/*
 				There was M-class command
 			*/
@@ -141,6 +164,8 @@ void AnalyzeCommand(uint8_t *buffer){
 				}
 			}
 
+		}else{
+			sendStaicMessage(WARNING_UNSUPPORTED_COMMAND);
 		}
 	}else{
 		sendStaicMessage(WARNING_NOTHING_TO_DO);
